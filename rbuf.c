@@ -38,23 +38,23 @@
   */
 RBUF_HandleTypeDef* RBUF_Init(size_t ItemSize, int Capacity)
 {
-	if (Capacity <= 0)
-		return NULL;
-	RBUF_HandleTypeDef *newRBUF = (RBUF_HandleTypeDef *)malloc(sizeof(RBUF_HandleTypeDef));
+  if (Capacity <= 0)
+    return NULL;
+  RBUF_HandleTypeDef *newRBUF = (RBUF_HandleTypeDef *)malloc(sizeof(RBUF_HandleTypeDef));
   if (newRBUF)
-	{
-		newRBUF->ItemSize = ItemSize;
-		newRBUF->Capacity = Capacity;
-		newRBUF->Head = 0;
-		newRBUF->Tail = 0;
-		newRBUF->Data = (void*) malloc(ItemSize * (Capacity + 1));
-		if (!newRBUF->Data)
-		{
-			free(newRBUF);
-			return NULL;
-		}
-		memset(newRBUF->Data, 0, ItemSize * (Capacity + 1));
-	}
+  {
+    newRBUF->ItemSize = ItemSize;
+    newRBUF->Capacity = Capacity;
+    newRBUF->Head = 0;
+    newRBUF->Tail = 0;
+    newRBUF->Data = (void*) malloc(ItemSize * (Capacity + 1));
+    if (!newRBUF->Data)
+    {
+      free(newRBUF);
+      return NULL;
+    }
+    memset(newRBUF->Data, 0, ItemSize * (Capacity + 1));
+  }
   return newRBUF;
 }
 
@@ -70,12 +70,12 @@ RBUF_HandleTypeDef* RBUF_Init(size_t ItemSize, int Capacity)
   */
 void RBUF_Destroy(RBUF_HandleTypeDef **RingBuffer)
 {
-	if (!(*RingBuffer))
-		return;
-	if ((*RingBuffer)->Data)
-		free((*RingBuffer)->Data);
-	free(*RingBuffer);
-	*RingBuffer = NULL;
+  if (!(*RingBuffer))
+    return;
+  if ((*RingBuffer)->Data)
+    free((*RingBuffer)->Data);
+  free(*RingBuffer);
+  *RingBuffer = NULL;
 }
 
 /***********************************************************************************************************/
@@ -91,11 +91,11 @@ void RBUF_Destroy(RBUF_HandleTypeDef **RingBuffer)
   */
 bool RBUF_Push(RBUF_HandleTypeDef *RingBuffer, const void *Data)
 {
-	if (RBUF_IsFull(RingBuffer))
-		return false;
-	memcpy((void*) &RingBuffer->Data[RingBuffer->Tail + 1], Data, RingBuffer->ItemSize);
-	RingBuffer->Tail += RingBuffer->ItemSize;
-	return true;
+  if (RBUF_IsFull(RingBuffer))
+    return false;
+  memcpy((void*) &RingBuffer->Data[RingBuffer->Tail + 1], Data, RingBuffer->ItemSize);
+  RingBuffer->Tail += RingBuffer->ItemSize;
+  return true;
 }
 
 /***********************************************************************************************************/
@@ -111,17 +111,17 @@ bool RBUF_Push(RBUF_HandleTypeDef *RingBuffer, const void *Data)
   */
 bool RBUF_Pop(RBUF_HandleTypeDef *RingBuffer, void *Data)
 {
-	if (RBUF_IsEmpty(RingBuffer))
-		return false;
-	memcpy(Data, (void*) &RingBuffer->Data[RingBuffer->Head + 1], RingBuffer->ItemSize);
-	RingBuffer->Data[RingBuffer->Head] = 0;
-	RingBuffer->Head += RingBuffer->ItemSize;
-	if (RBUF_IsEmpty(RingBuffer))
-	{
-		RingBuffer->Head = 0;
-		RingBuffer->Tail = 0;
-	}
-	return true;
+  if (RBUF_IsEmpty(RingBuffer))
+    return false;
+  memcpy(Data, (void*) &RingBuffer->Data[RingBuffer->Head + 1], RingBuffer->ItemSize);
+  RingBuffer->Data[RingBuffer->Head] = 0;
+  RingBuffer->Head += RingBuffer->ItemSize;
+  if (RBUF_IsEmpty(RingBuffer))
+  {
+    RingBuffer->Head = 0;
+    RingBuffer->Tail = 0;
+  }
+  return true;
 }
 
 /***********************************************************************************************************/
@@ -136,7 +136,7 @@ bool RBUF_Pop(RBUF_HandleTypeDef *RingBuffer, void *Data)
   */
 bool RBUF_IsEmpty(RBUF_HandleTypeDef *RingBuffer)
 {
-	return (RingBuffer->Tail == RingBuffer->Head) ? true : false;
+  return (RingBuffer->Tail == RingBuffer->Head) ? true : false;
 }
 
 /***********************************************************************************************************/
@@ -151,8 +151,8 @@ bool RBUF_IsEmpty(RBUF_HandleTypeDef *RingBuffer)
   */
 bool RBUF_IsFull(RBUF_HandleTypeDef *RingBuffer)
 {
-	return (((RingBuffer->Tail + RingBuffer->ItemSize) \
-					% ((RingBuffer->Capacity + 1) * RingBuffer->ItemSize)) == RingBuffer->Head) ? true : false;
+  return (((RingBuffer->Tail + RingBuffer->ItemSize) \
+          % ((RingBuffer->Capacity + 1) * RingBuffer->ItemSize)) == RingBuffer->Head) ? true : false;
 }
 
 /***********************************************************************************************************/
@@ -167,14 +167,14 @@ bool RBUF_IsFull(RBUF_HandleTypeDef *RingBuffer)
   */
 int RBUF_GetFree(RBUF_HandleTypeDef *RingBuffer)
 {
-	int freeSpace = 0;
-	if (RingBuffer->Head > RingBuffer->Tail)
-		freeSpace = RingBuffer->Capacity \
-				- ((RingBuffer->Head - RingBuffer->Tail) / RingBuffer->ItemSize);
-	else
-		freeSpace = RingBuffer->Capacity \
-				- ((RingBuffer->Tail - RingBuffer->Head) / RingBuffer->ItemSize);
-	return freeSpace;
+  int freeSpace = 0;
+  if (RingBuffer->Head > RingBuffer->Tail)
+    freeSpace = RingBuffer->Capacity \
+        - ((RingBuffer->Head - RingBuffer->Tail) / RingBuffer->ItemSize);
+  else
+    freeSpace = RingBuffer->Capacity \
+        - ((RingBuffer->Tail - RingBuffer->Head) / RingBuffer->ItemSize);
+  return freeSpace;
 }
 
 /***********************************************************************************************************/
@@ -189,7 +189,7 @@ int RBUF_GetFree(RBUF_HandleTypeDef *RingBuffer)
   */
 int RBUF_GetCapacity(RBUF_HandleTypeDef *RingBuffer)
 {
-	return RingBuffer->Capacity;
+  return RingBuffer->Capacity;
 }
 
 /***********************************************************************************************************/
