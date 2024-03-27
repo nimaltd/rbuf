@@ -8,9 +8,6 @@
 -  LinkedIn:   https://www.linkedin.com/in/nimaltd  
 -  Instagram:  https://instagram.com/github.NimaLTD  
 ---
-> [!NOTE]
->I Have Converted this Library To CubeMX Style :)  https://github.com/serbayozkan/GenericCircularBuffer_C/tree/main
-
 > [!CAUTION]
 > This Library using malloc(), Please increase the Heap Size.
 ---
