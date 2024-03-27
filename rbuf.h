@@ -1,6 +1,5 @@
-
-#ifndef _CBUF_H_
-#define _CBUF_H_
+#ifndef _RBUF_H_
+#define _RBUF_H_
 
 /***********************************************************************************************************
 
@@ -10,14 +9,11 @@
   Youtube:    https://www.youtube.com/@nimaltd
   Instagram:  https://instagram.com/github.NimaLTD
 
-  I have modified this library: https://github.com/serbayozkan/GenericRingBuffer_C
-
-  Version:    1.0.0
+  Version:    2.0.0
 
   History:
-
-              1.0.0
-              - First Release
+              2.0.0
+              - Rewrite again
               - Support STM32CubeMx Packet installer
 
 ***********************************************************************************************************/
@@ -31,10 +27,10 @@ extern "C"
 **************    Include Headers
 ************************************************************************************************************/
 
+#include <stdint.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include <stdlib.h>
-#include <stdint.h>
 
 /************************************************************************************************************
 **************    Public Definitions
@@ -48,11 +44,12 @@ extern "C"
 
 typedef struct
 {
-  int                 Head;
-  int                 Tail;
-  int                 Capacity;
-  size_t              ItemSize;
-  uint8_t             *Data;
+  size_t               ItemSize;
+  uint32_t             Capacity;
+  uint32_t             Head;
+  uint32_t             Tail;
+  uint32_t             Count;
+  void                 *Buffer;
 
 } RBUF_HandleTypeDef;
 
@@ -60,17 +57,15 @@ typedef struct
 **************    Public Functions
 ************************************************************************************************************/
 
-RBUF_HandleTypeDef*   RBUF_Init(size_t ItemSize, int Capacity);
-void                  RBUF_Destroy(RBUF_HandleTypeDef **RingBuffer);
-bool                  RBUF_Push(RBUF_HandleTypeDef *RingBuffer, const void *Data);
-bool                  RBUF_Pop(RBUF_HandleTypeDef *RingBuffer, void *Data);
-bool                  RBUF_IsEmpty(RBUF_HandleTypeDef *RingBuffer);
-bool                  RBUF_IsFull(RBUF_HandleTypeDef *RingBuffer);
-int                   RBUF_GetFree(RBUF_HandleTypeDef *RingBuffer);
-int                   RBUF_GetCapacity(RBUF_HandleTypeDef *RingBuffer);
+RBUF_HandleTypeDef*    RBUF_Init(size_t ItemSize, uint32_t Capacity);
+void                   RBUF_DeInit(RBUF_HandleTypeDef *rbuf);
+bool                   RBUF_IsFull(RBUF_HandleTypeDef *rbuf);
+bool                   RBUF_IsEmpty(RBUF_HandleTypeDef *rbuf);
+uint32_t               RBUF_Available(RBUF_HandleTypeDef *rbuf);
+bool                   RBUF_Push(RBUF_HandleTypeDef *rbuf, const void *data);
+bool                   RBUF_Pop(RBUF_HandleTypeDef *rbuf, void *data);
 
 #ifdef __cplusplus
 }
 #endif
-
 #endif
