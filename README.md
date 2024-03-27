@@ -8,8 +8,9 @@
 -  LinkedIn:   https://www.linkedin.com/in/nimaltd  
 -  Instagram:  https://instagram.com/github.NimaLTD  
 ---  
-- I Have Canverted this Library To CubeMX Style :)  https://github.com/serbayozkan/GenericCircularBuffer_C/tree/main
-- This Library using malloc(), Please increase the Heap Size.
+- I Have Converted this Library To CubeMX Style :)  https://github.com/serbayozkan/GenericCircularBuffer_C/tree/main
+> [CAUTTION]
+> This Library using malloc(), Please increase the Heap Size.
 ---
 * Install Library from https://github.com/nimaltd/STM32-PACK/raw/main/RBUF/NimaLTD.I-CUBE-RBUF.pdsc
 * Add and enable it.
