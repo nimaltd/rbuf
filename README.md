@@ -1,4 +1,4 @@
-# Ring Buffer (Circular Buffer) Library for STM32
+# Multitype Ring Buffer (Circular Buffer) Library for STM32
 ---  
 ## Please Do not Forget to get STAR, DONATE and support me on social networks. Thank you. :sparkling_heart:  
 ---   
