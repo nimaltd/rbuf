@@ -17,8 +17,9 @@
 * Generate Code.
 ---
 # Watch the Video:
-
-Coming Soon
+<div align="center">
+  <a href="https://www.youtube.com/watch?v=y0S2fBNsExo"><img src="https://img.youtube.com/vi/y0S2fBNsExo/0.jpg" alt="Video"></a>
+</div>
 ---
 ```
 #include "rbuf.h"
