@@ -9,9 +9,12 @@
   Youtube:    https://www.youtube.com/@nimaltd
   Instagram:  https://instagram.com/github.NimaLTD
 
-  Version:    2.0.0
+  Version:    2.1.0
 
   History:
+			  2.1.0
+              - Added RBUF_Used(),RBUF_Format() functions
+
               2.0.0
               - Rewrite again
               - Support STM32CubeMx Packet installer
@@ -62,6 +65,8 @@ void                   RBUF_DeInit(RBUF_HandleTypeDef *rbuf);
 bool                   RBUF_IsFull(RBUF_HandleTypeDef *rbuf);
 bool                   RBUF_IsEmpty(RBUF_HandleTypeDef *rbuf);
 uint32_t               RBUF_Available(RBUF_HandleTypeDef *rbuf);
+uint32_t               RBUF_Used(RBUF_HandleTypeDef *rbuf);
+void                   RBUF_Format(RBUF_HandleTypeDef *rbuf);
 bool                   RBUF_Push(RBUF_HandleTypeDef *rbuf, const void *data);
 bool                   RBUF_Pop(RBUF_HandleTypeDef *rbuf, void *data);
 

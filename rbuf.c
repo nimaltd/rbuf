@@ -128,6 +128,36 @@ uint32_t RBUF_Available(RBUF_HandleTypeDef *rbuf)
 /***********************************************************************************************************/
 
 /**
+  * @brief  Get the number of used slots in the ring buffer.
+  * @note   This function returns the number of used slots in the
+  *         ring buffer.
+  * @param  rbuf: Pointer to the ring buffer handle.
+  * @retval Number of used slots in the ring buffer.
+  */
+uint32_t RBUF_Used(RBUF_HandleTypeDef *rbuf)
+{
+	return rbuf->Count;
+}
+
+/***********************************************************************************************************/
+
+/**
+  * @brief  Make empty the buffer..
+  * @note   Erase all data and pointers.
+  * @param  rbuf: Pointer to the ring buffer handle.
+  * @retval None.
+  */
+void RBUF_Format(RBUF_HandleTypeDef *rbuf)
+{
+	rbuf->Head = 0;
+	rbuf->Tail = 0;
+	rbuf->Count = 0;
+	memset(rbuf->Buffer, 0, rbuf->Capacity * rbuf->ItemSize);
+}
+
+/***********************************************************************************************************/
+
+/**
   * @brief  Pushes data into the ring buffer.
   * @note   This function pushes data into the ring buffer if there is available
   *         space. If the buffer is full, the operation fails and returns false.
