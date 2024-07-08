@@ -169,14 +169,42 @@ bool RBUF_Push(RBUF_HandleTypeDef *rbuf, const void *data)
 {
   if (RBUF_IsFull(rbuf))
   {
-    return 0;
+    return false;
   }
-
   uint8_t *dest = (uint8_t*) rbuf->Buffer + rbuf->Head * rbuf->ItemSize;
   memcpy(dest, data, rbuf->ItemSize);
   rbuf->Head = (rbuf->Head + 1) % rbuf->Capacity;
   rbuf->Count++;
-  return 1;
+  return true;
+}
+
+/***********************************************************************************************************/
+
+/**
+  * @brief  Push n*data into the ring buffer.
+  * @note   This function pushes data into the ring buffer if there is available
+  *         space. If the buffer is full, the operation fails and returns false.
+  * @param  rbuf: Pointer to the ring buffer handle.
+  * @param  data: Pointer to the data to be pushed into the buffer.
+  * @param  num: number of data to be pushed into the buffer.
+  * @retval true if the data was successfully pushed, false otherwise (buffer full).
+  */
+bool RBUF_PushN(RBUF_HandleTypeDef *rbuf, const void *data, uint32_t num)
+{
+	const uint8_t *src = (const uint8_t*) data;
+	if (num > RBUF_Available(rbuf))
+	{
+		return false;
+	}
+	for (uint32_t i = 0; i < num; ++i)
+	{
+		uint8_t *dest = (uint8_t*) rbuf->Buffer + rbuf->Head * rbuf->ItemSize;
+		memcpy(dest, src, rbuf->ItemSize);
+		rbuf->Head = (rbuf->Head + 1) % rbuf->Capacity;
+		rbuf->Count++;
+		src += rbuf->ItemSize;
+	}
+	return true;
 }
 
 /***********************************************************************************************************/
@@ -193,11 +221,40 @@ bool RBUF_Pop(RBUF_HandleTypeDef *rbuf, void *data)
 {
   if (RBUF_IsEmpty(rbuf))
   {
-    return 0;
+    return false;
   }
   uint8_t *src = (uint8_t*) rbuf->Buffer + rbuf->Tail * rbuf->ItemSize;
   memcpy(data, src, rbuf->ItemSize);
   rbuf->Tail = (rbuf->Tail + 1) % rbuf->Capacity;
   rbuf->Count--;
-  return 1;
+  return true;
+}
+
+/***********************************************************************************************************/
+
+/**
+  * @brief  Pops n*data from the ring buffer.
+  * @note   This function pops data from the ring buffer if there is available
+  *         data. If the buffer is empty, the operation fails and returns false.
+  * @param  rbuf: Pointer to the ring buffer handle.
+  * @param  data: Pointer to the memory where the popped data will be stored.
+  * @param  num: number of data to read.
+  * @retval true if data was successfully popped, false otherwise (buffer empty).
+  */
+bool RBUF_PopN(RBUF_HandleTypeDef *rbuf, void *data, uint32_t num)
+{
+	uint8_t *dest = (uint8_t*) data;
+	if (num > RBUF_Used(rbuf))
+	{
+		return false;
+	}
+	for (uint32_t i = 0; i < num; ++i)
+	{
+		uint8_t *src = (uint8_t*) rbuf->Buffer + rbuf->Tail * rbuf->ItemSize;
+		memcpy(dest, src, rbuf->ItemSize);
+		rbuf->Tail = (rbuf->Tail + 1) % rbuf->Capacity;
+		rbuf->Count--;
+		dest += rbuf->ItemSize;
+	}
+	return true;
 }
