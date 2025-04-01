@@ -23,7 +23,7 @@
 </div>
 
 ---
-```
+``` c
 #include "rbuf.h"
 .
 .
