@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Host unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # The same command a developer runs locally. One definition of "run the
+      # tests", so CI and a workstation cannot drift apart.
+      - name: Build and test
+        run: python3 test/run_tests.py
+
+  arm-build:
+    name: Cross compile for Cortex-M
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # Third party action, pinned to the v1.13.0 commit rather than the tag, so
+      # the code that runs here cannot change without this line changing.
+      - name: Install arm-none-eabi-gcc
+        uses: carlosperate/arm-none-eabi-gcc-action@98c40e51546516419841748d3210c290df0d2c6c
+
+      # Proves the library builds for the targets it is written for, using the
+      # test stub to stand in for main.h. The M0 has no divide instruction,
+      # which is why rbuf uses none.
+      - name: Compile
+        run: |
+          for cpu in cortex-m0plus cortex-m4 cortex-m7 cortex-m33; do
+            arm-none-eabi-gcc -c src/rbuf.c -o /tmp/rbuf.o -Itest/stub \
+              -mcpu=$cpu -mthumb -std=c11 \
+              -Wall -Wextra -Wpedantic -Werror -Wundef -Os
+          done

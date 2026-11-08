@@ -1,0 +1,53 @@
+# Read by libNIMA. See https://github.com/nimaltd/libNIMA
+#
+# There is no version here. libNIMA reads it from the @version tag in
+# rbuf.h, so the source files are the only place it is written.
+
+name: rbuf
+description: Ring buffer for items of any type, safe between interrupts and threads, for STM32
+repository: https://github.com/nimaltd/rbuf
+license: Apache-2.0
+
+# The projects it is installed into: STM32, made by CubeMX.
+platform: stm32
+
+# What this library is.
+# kind:     driver, middleware, rtos, protocol, filesystem, utility, bsp
+# category: sensor, storage, display, communication, wireless, rtos, timing,
+#           power, input, math, system
+kind: utility
+category: system
+
+# Capabilities this library gives other libraries. An RTOS would say [rtos].
+provides: []
+
+# What the project has to offer before this library works.
+requires:
+  libnima: 1.0.0       # the oldest libNIMA that reads this file
+  libraries: []       # needs no other library, not even osal
+  peripherals: []     # no peripheral of its own
+
+stm32:
+  requires:
+    hal: true           # assert_param, from the HAL's configuration
+    cmsis: true         # __DMB, and PRIMASK for the few sums done with interrupts off
+    rtos: optional      # works the same with no RTOS, FreeRTOS or ThreadX
+    hal_modules: []     # no HAL module of its own
+    c_standard: c11
+
+# Every file keeps the path it has here, so src/ lands in the user's project
+# just as it sits.
+
+# The version is read from the first header. There is no configuration
+# header: rbuf has nothing to set.
+headers:
+  - src/rbuf.h
+sources:
+  - src/rbuf.c
+
+# Copied as they are, alongside the code.
+extras:
+  - LICENSE.md
+  - NOTICE
+  - README.md
+  - CHANGELOG.md
