@@ -312,10 +312,12 @@ rbuf_err_t rbuf_pop_n(rbuf_t *handle, void *items, uint32_t n)
 
 /*****************************************************************************************************/
 /**
- * @brief Drop every item.
+ * @brief Drop every item a pop could take now.
  *
  * As a pop of every item there is would, and the memory is left as it is. A
  * push still copying in keeps its slots, and its items arrive once it is done.
+ * So do the items of a push that landed in the middle of it, even one that has
+ * returned already: they were not there to pop yet, so they are not dropped.
  * A pop still copying out keeps the items it took.
  *
  * @param[in,out] handle  Handle from rbuf_init().

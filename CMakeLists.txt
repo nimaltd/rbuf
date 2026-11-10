@@ -9,10 +9,10 @@ project(rbuf
 option(RBUF_BUILD_TESTS "Build the host unit tests" OFF)
 
 # rbuf.c needs one header it does not ship: the platform main.h. Point
-# RBUF_CONFIG_DIR at the folder holding it, normally Core/Inc in a CubeMX
+# RBUF_MAIN_DIR at the folder holding it, normally Core/Inc in a CubeMX
 # project. The tests supply a stub instead.
-if(RBUF_BUILD_TESTS AND NOT DEFINED RBUF_CONFIG_DIR)
-    set(RBUF_CONFIG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test/stub")
+if(RBUF_BUILD_TESTS AND NOT DEFINED RBUF_MAIN_DIR)
+    set(RBUF_MAIN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/test/stub")
 endif()
 
 add_library(rbuf STATIC src/rbuf.c)
@@ -23,8 +23,8 @@ target_include_directories(rbuf PUBLIC
 
 target_compile_features(rbuf PUBLIC c_std_11)
 
-if(DEFINED RBUF_CONFIG_DIR)
-    target_include_directories(rbuf PRIVATE ${RBUF_CONFIG_DIR})
+if(DEFINED RBUF_MAIN_DIR)
+    target_include_directories(rbuf PRIVATE ${RBUF_MAIN_DIR})
 endif()
 
 if(RBUF_BUILD_TESTS)

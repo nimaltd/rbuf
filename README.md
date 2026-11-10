@@ -21,9 +21,9 @@ Push from a UART interrupt and pop in the main loop, or pass messages between Fr
   to configure: an interrupt and the main loop, two interrupts at different
   priorities, or five threads logging into one buffer
 - The interrupts are paused only for the few sums that take slots and give
-  them back, never while items are copied. Measured, the highest priority
-  interrupt runs at most 25 CPU cycles later than with no rbuf at all,
-  whether a call moves 1 byte or 1 KB
+  them back, never while items are copied. Measured on a Cortex-M33, the
+  highest priority interrupt runs at most 25 CPU cycles later than with no
+  rbuf at all, whether a call moves 1 byte or 1 KB
 - The same on bare metal, FreeRTOS and ThreadX. It needs no RTOS and no other
   library
 - `rbuf_push_n()` and `rbuf_pop_n()` move many items at once, all of them or
@@ -218,6 +218,8 @@ Every call, from anywhere: any interrupt at any priority, any thread, the main l
 
 The one exception is the NMI, and a fault handler such as HardFault. They are the only ones the interrupts' switch, PRIMASK, does not hold off, so they must not use a buffer anything else uses.
 
+Threads have to run privileged, as CubeMX sets FreeRTOS and ThreadX up. A Cortex-M ignores a write to PRIMASK from unprivileged code, without any error, so tasks made unprivileged, such as with FreeRTOS's MPU port, are not kept apart and must not share a buffer.
+
 `rbuf_used()` and `rbuf_space()` count what a pop or a push could take right now. Read from the only place that pops, `rbuf_used()` can only grow until it pops again, and read from the only place that pushes, `rbuf_space()` can only grow until it pushes again. With several places at it, either can change the moment after it is read, and `rbuf_pop_n()` and `rbuf_push_n()` are what decide: all of it or nothing.
 
 ### How several at once keep out of each other's way
@@ -234,13 +236,13 @@ Measured on a NUCLEO-H503RB at 250 MHz: a timer at the highest priority, firing 
 | 64 bytes | 480 cycles | 18 cycles | 42 cycles | 501 cycles |
 | 1 KB | 6257 cycles | 18 cycles | 43 cycles | 6263 cycles |
 
-Each figure is the worst seen in one second of it. rbuf adds at most 25 cycles to what the same copies cost with no lock at all, whatever their size. At 72 MHz that is 0.35 us, where a lock round a whole 1 KB call adds 87 us. A UART at 921600 baud brings a byte every 11 us, so that lock would lose bytes from it, and rbuf does not.
+Each figure is the worst seen in one second of it. On this Cortex-M33, rbuf adds at most 25 cycles to what the same copies cost with no lock at all, whatever their size. A Cortex-M0 takes more cycles for the same few sums, and its pause is as flat. At 72 MHz 25 cycles is 0.35 us, where a lock round a whole 1 KB call adds 87 us. A UART at 921600 baud brings a byte every 11 us, so that lock would lose bytes from it, and rbuf does not.
 
 ### What a copy holds up
 
 Items come out in the order their slots were taken. Items pushed by an interrupt that landed in the middle of another push reach a pop only once that push is done too. Between interrupts that is never longer than one copy: 480 cycles for 64 bytes, 2 us at 250 MHz.
 
-With an RTOS, a low priority thread that loses the CPU in the middle of its copy holds up the items pushed after it until it runs again. Nothing is lost or torn, they only come out later. Pushing and then waking the thread that pops, as in the example below, still works, because the push that finishes last wakes it after every item is there. A thread deleted or suspended from outside in the middle of a push or a pop would hold the buffer up for good, so do not stop one that may be inside an rbuf call.
+With an RTOS, a low priority thread that loses the CPU in the middle of its copy holds up the items pushed after it until it runs again. Nothing is lost or torn, they only come out later. So a thread waiting for items, or for room, must wait on the RTOS and never spin on `rbuf_is_empty()` or a failing pop: spinning at a higher priority keeps the CPU from the thread that is in the middle of its copy, and neither would ever get on. Pushing and then waking the thread that pops, as in the example below, still works, because the push that finishes last wakes it after every item is there. A thread deleted or suspended from outside in the middle of a push or a pop would hold the buffer up for good, so do not stop one that may be inside an rbuf call.
 
 On a NUCLEO-H503RB, two timer interrupts pushed into one buffer for 3 seconds, the higher priority one landing in the middle of the other's pushes, while the main loop popped: all 1.6 million messages came out whole and in order. The same with one interrupt pushing and both the main loop and a second interrupt popping, and with the main loop and an interrupt pushing while a higher interrupt popped.
 
@@ -298,7 +300,7 @@ rbuf is made and tested for one core. PRIMASK pauses only the core that sets it,
 | `rbuf_err_t rbuf_push_n(rbuf_t *handle, const void *items, uint32_t n)` | Copy `n` items in, at the end, all of them or none |
 | `rbuf_err_t rbuf_pop(rbuf_t *handle, void *item)` | Copy the oldest item out, and take it out of the buffer |
 | `rbuf_err_t rbuf_pop_n(rbuf_t *handle, void *items, uint32_t n)` | Copy the `n` oldest items out, and take them out, all of them or none |
-| `void rbuf_flush(rbuf_t *handle)` | Drop every item. The memory is left as it is |
+| `void rbuf_flush(rbuf_t *handle)` | Drop every item a pop could take now. The memory is left as it is. Items not ready to pop yet, because a push is still copying, arrive after it |
 | `uint32_t rbuf_used(const rbuf_t *handle)` | How many items are waiting to be popped. Items still being pushed are not counted yet |
 | `uint32_t rbuf_space(const rbuf_t *handle)` | How many more items there is room for. Slots still being popped are not counted yet |
 | `bool rbuf_is_empty(const rbuf_t *handle)` | Whether there is nothing to pop |

@@ -10,7 +10,7 @@ cmake-build-*/
 .vscode/
 .idea/
 
-# Python, from install.py and the test runner
+# Python, from the test runner
 __pycache__/
 *.py[cod]
 .pytest_cache/

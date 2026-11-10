@@ -124,7 +124,7 @@ rbuf_err_t rbuf_pop_n(rbuf_t *handle, void *items, uint32_t n);
 
 /*****************************************************************************************************/
 /**
- * @brief Drop every item.
+ * @brief Drop every item a pop could take now.
  */
 void rbuf_flush(rbuf_t *handle);
 
